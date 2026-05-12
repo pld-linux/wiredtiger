@@ -1,6 +1,5 @@
 # TODO:
 # -DENABLE_MEMKIND (BR: libmemkind) for NVRAM/SSD caches
-# -DENABLE_IAA (BR: libqpl)
 # -DENABLE_S3 (BR: aws-sdk-cpp: aws-cpp-sdk-s3-crt, aws-cpp-sdk-core)
 # -DENABLE_GCP (BR: google-cloud-cpp: google_cloud_cpp_storage, google_cloud_cpp_common)
 # -DENABLE_AZURE (BR: azure-sdk-for-cpp: azure-storage-blobs-cpp, azure-core-cpp)
@@ -9,7 +8,11 @@
 # Conditional build:
 %bcond_without	static_libs	# static libraries
 %bcond_without	python		# Python binding
+%bcond_without	qpl		# IAA compression via libqpl
 #
+%ifnarch %{x8664}
+%undefine	with_qpl
+%endif
 %{?use_default_jdk:%use_default_jdk}
 Summary:	The WiredTiger Data Engine
 Summary(pl.UTF-8):	Silnik danych WiredTiger
@@ -23,10 +26,12 @@ Source0:	https://github.com/wiredtiger/wiredtiger/archive/%{version}/%{name}-%{v
 # Source0-md5:	41baa8cd5d81a48e29921b3fc2a8d306
 Patch0:		%{name}-buildtype.patch
 URL:		https://source.wiredtiger.com/
+%{?with_qpl:BuildRequires:	accel-config-devel}
 BuildRequires:	cmake >= 3.10
 BuildRequires:	libsodium-devel
 BuildRequires:	libstdc++-devel >= 6:7
 BuildRequires:	lz4-devel
+%{?with_qpl:BuildRequires:	qpl-devel}
 BuildRequires:	rpmbuild(macros) >= 2.022
 BuildRequires:	snappy-devel
 BuildRequires:	zlib-devel
@@ -102,11 +107,12 @@ CFLAGS="%{rpmcflags} -Wno-error=unterminated-string-initialization -Wno-error=di
 %cmake .. \
 	-DCMAKE_INSTALL_INCLUDEDIR=include \
 	-DCMAKE_INSTALL_LIBDIR=%{_lib} \
-	%{?with_static_libs:-DENABLE_STATIC=ON} \
+	%{?with_qpl:-DENABLE_IAA=ON} \
 	-DENABLE_LZ4=ON \
 	-DENABLE_PYTHON=%{__ON_OFF python} \
 	-DENABLE_SNAPPY=ON \
 	-DENABLE_SODIUM=ON \
+	%{?with_static_libs:-DENABLE_STATIC=ON} \
 	-DENABLE_ZLIB=ON \
 	-DENABLE_ZSTD=ON
 
@@ -137,6 +143,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc LICENSE README
 %attr(755,root,root) %{_bindir}/wt
 %{_libdir}/libwiredtiger.so.%{version}
+%if %{with qpl}
+%{_libdir}/libwiredtiger_iaa.so
+%endif
 %{_libdir}/libwiredtiger_lz4.so
 %{_libdir}/libwiredtiger_snappy.so
 %{_libdir}/libwiredtiger_sodium.so
