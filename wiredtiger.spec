@@ -18,6 +18,7 @@ Group:		Libraries
 Source0:	https://github.com/wiredtiger/wiredtiger/archive/%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	fa0e475ab6808adbadc8868078dc94a3
 Patch0:		%{name}-python.patch
+Patch1:		%{name}-pc.patch
 URL:		https://source.wiredtiger.com/
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.10
@@ -98,6 +99,7 @@ Interfejs Pythona do silnika danych WiredTiger.
 %prep
 %setup -q
 %patch -P0 -p1
+%patch -P1 -p1
 
 %build
 # does much more beside autoreconf
