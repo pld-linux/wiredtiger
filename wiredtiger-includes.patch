@@ -1,0 +1,10 @@
+--- wiredtiger-11.3.1/ext/storage_sources/gcp_store/gcp_log_system.cpp.orig	2024-11-14 23:24:41.000000000 +0100
++++ wiredtiger-11.3.1/ext/storage_sources/gcp_store/gcp_log_system.cpp	2026-05-17 20:56:05.115215096 +0200
+@@ -25,6 +25,7 @@
+  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  * OTHER DEALINGS IN THE SOFTWARE.
+  */
++#include <cassert>
+ #include "gcp_log_system.h"
+ 
+ gcp_log_system::gcp_log_system(WT_EXTENSION_API *wt_api, int32_t wt_verbosity_level)

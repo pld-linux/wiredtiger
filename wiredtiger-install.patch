@@ -1,0 +1,41 @@
+--- wiredtiger-11.3.1/ext/storage_sources/azure_store/CMakeLists.txt.orig	2024-11-14 23:24:41.000000000 +0100
++++ wiredtiger-11.3.1/ext/storage_sources/azure_store/CMakeLists.txt	2026-05-17 21:34:56.739330448 +0200
+@@ -54,6 +54,8 @@ target_link_libraries(
+         azure_container_util
+ )
+ 
++install(TARGETS wiredtiger_azure_store LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
++
+ if(HAVE_UNITTEST)
+     add_subdirectory(test)
+ endif()
+--- wiredtiger-11.3.1/ext/storage_sources/dir_store/CMakeLists.txt.orig	2024-11-14 23:24:41.000000000 +0100
++++ wiredtiger-11.3.1/ext/storage_sources/dir_store/CMakeLists.txt	2026-05-17 21:35:24.641736714 +0200
+@@ -19,3 +19,5 @@ target_compile_options(
+     wiredtiger_dir_store
+     PRIVATE ${COMPILER_DIAGNOSTIC_C_FLAGS}
+ )
++
++install(TARGETS wiredtiger_dir_store LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+--- wiredtiger-11.3.1/ext/storage_sources/gcp_store/CMakeLists.txt.orig	2024-11-14 23:24:41.000000000 +0100
++++ wiredtiger-11.3.1/ext/storage_sources/gcp_store/CMakeLists.txt	2026-05-17 21:35:42.171848026 +0200
+@@ -52,6 +52,8 @@ target_link_libraries(
+         gcp_bucket_util
+ )
+ 
++install(TARGETS wiredtiger_gcp_store LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
++
+ if(HAVE_UNITTEST)
+     add_subdirectory(test)
+ endif()
+--- wiredtiger-11.3.1/ext/storage_sources/s3_store/CMakeLists.txt.orig	2024-11-14 23:24:41.000000000 +0100
++++ wiredtiger-11.3.1/ext/storage_sources/s3_store/CMakeLists.txt	2026-05-17 21:35:57.947719121 +0200
+@@ -46,6 +46,8 @@ target_link_libraries(
+         aws-sdk::core
+ )
+ 
++install(TARGETS wiredtiger_s3_store LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
++
+ # Add the unit tests, need Catch2 which is resolved with HAVE_UNITTEST.
+ if(HAVE_UNITTEST)
+     add_subdirectory(test)

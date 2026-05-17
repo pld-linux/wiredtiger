@@ -1,12 +1,11 @@
 # TODO:
 # -DENABLE_S3 (BR: aws-sdk-cpp: aws-cpp-sdk-s3-crt, aws-cpp-sdk-core)
-# -DENABLE_GCP (BR: google-cloud-cpp: google_cloud_cpp_storage, google_cloud_cpp_common)
 # -DENABLE_AZURE (BR: azure-sdk-for-cpp: azure-storage-blobs-cpp, azure-core-cpp)
-# libaccel-config?
 #
 # Conditional build:
 %bcond_without	static_libs	# static libraries
 %bcond_without	python		# Python binding
+%bcond_without	gcp		# Google Cloud Platform support
 %bcond_without	memkind		# NVRAM/SSD block caches support via memkind
 %bcond_without	qpl		# IAA compression via libqpl
 #
@@ -25,9 +24,13 @@ Group:		Libraries
 Source0:	https://github.com/wiredtiger/wiredtiger/archive/%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	41baa8cd5d81a48e29921b3fc2a8d306
 Patch0:		%{name}-buildtype.patch
+Patch1:		%{name}-includes.patch
+Patch2:		%{name}-install.patch
 URL:		https://source.wiredtiger.com/
 %{?with_qpl:BuildRequires:	accel-config-devel}
 BuildRequires:	cmake >= 3.10
+# google_cloud_cpp_storage, google_cloud_cpp_common
+%{?with_gcp:BuildRequires:	google-cloud-cpp-devel >= 2.6.0}
 BuildRequires:	libsodium-devel
 BuildRequires:	libstdc++-devel >= 6:7
 BuildRequires:	lz4-devel
@@ -93,6 +96,8 @@ Interfejs Pythona do silnika danych WiredTiger.
 %prep
 %setup -q
 %patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
 
 # modules, not executables
 %{__sed} -i -e '1s,#!/usr/bin/env python$,#,' lang/python/wiredtiger/*.py
@@ -108,6 +113,7 @@ CFLAGS="%{rpmcflags} -Wno-error=unterminated-string-initialization -Wno-error=di
 %cmake .. \
 	-DCMAKE_INSTALL_INCLUDEDIR=include \
 	-DCMAKE_INSTALL_LIBDIR=%{_lib} \
+	%{?with_gcp:-DENABLE_GCP=ON} \
 	%{?with_qpl:-DENABLE_IAA=ON} \
 	-DENABLE_LZ4=ON \
 	%{?with_memkind:-DENABLE_MEMKIND=ON} \
@@ -145,6 +151,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc LICENSE README
 %attr(755,root,root) %{_bindir}/wt
 %{_libdir}/libwiredtiger.so.%{version}
+%{_libdir}/libwiredtiger_dir_store.so
+%if %{with gcp}
+%{_libdir}/libwiredtiger_gcp_store.so
+%endif
 %if %{with qpl}
 %{_libdir}/libwiredtiger_iaa.so
 %endif
