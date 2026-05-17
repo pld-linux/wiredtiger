@@ -1,5 +1,4 @@
 # TODO:
-# -DENABLE_MEMKIND (BR: libmemkind) for NVRAM/SSD caches
 # -DENABLE_S3 (BR: aws-sdk-cpp: aws-cpp-sdk-s3-crt, aws-cpp-sdk-core)
 # -DENABLE_GCP (BR: google-cloud-cpp: google_cloud_cpp_storage, google_cloud_cpp_common)
 # -DENABLE_AZURE (BR: azure-sdk-for-cpp: azure-storage-blobs-cpp, azure-core-cpp)
@@ -8,6 +7,7 @@
 # Conditional build:
 %bcond_without	static_libs	# static libraries
 %bcond_without	python		# Python binding
+%bcond_without	memkind		# NVRAM/SSD block caches support via memkind
 %bcond_without	qpl		# IAA compression via libqpl
 #
 %ifnarch %{x8664}
@@ -31,6 +31,7 @@ BuildRequires:	cmake >= 3.10
 BuildRequires:	libsodium-devel
 BuildRequires:	libstdc++-devel >= 6:7
 BuildRequires:	lz4-devel
+%{?with_memkind:BuildRequires:	memkind-devel}
 %{?with_qpl:BuildRequires:	qpl-devel}
 BuildRequires:	rpmbuild(macros) >= 2.022
 BuildRequires:	snappy-devel
@@ -109,6 +110,7 @@ CFLAGS="%{rpmcflags} -Wno-error=unterminated-string-initialization -Wno-error=di
 	-DCMAKE_INSTALL_LIBDIR=%{_lib} \
 	%{?with_qpl:-DENABLE_IAA=ON} \
 	-DENABLE_LZ4=ON \
+	%{?with_memkind:-DENABLE_MEMKIND=ON} \
 	-DENABLE_PYTHON=%{__ON_OFF python} \
 	-DENABLE_SNAPPY=ON \
 	-DENABLE_SODIUM=ON \
